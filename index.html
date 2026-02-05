@@ -3,44 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>COCO SOVEREIGN CORE V5</title>
+    <title>COCO SOVEREIGN ELITE V6</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;600;800&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --gold: #f1c40f; --bg: #000; --card: #0a0a0a; --border: #1a1a1a; --green: #00ff88; }
+        :root { --gold: #f1c40f; --gold-glow: rgba(241, 196, 15, 0.4); --bg: #050505; --card: rgba(15, 15, 15, 0.8); --border: #1a1a1a; }
+        
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+        
         body { background: var(--bg); color: white; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        .header { background: #000; padding: 15px; border-bottom: 1px solid var(--border); text-align: center; font-family: 'Orbitron'; font-size: 10px; color: var(--gold); letter-spacing: 2px; }
+        /* පින්තූරෙ වගේ Header එක */
+        .header { background: rgba(0,0,0,0.9); padding: 18px; border-bottom: 1px solid #222; text-align: center; font-family: 'Orbitron'; font-size: 11px; color: var(--gold); letter-spacing: 3px; text-shadow: 0 0 10px var(--gold-glow); }
+
         .content { flex: 1; overflow-y: auto; padding-bottom: 100px; width: 100%; max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
         .page { display: none; width: 100%; padding: 20px; text-align: center; }
-        .page.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .page.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .vault-card { width: 100%; background: linear-gradient(145deg, #050505, #111); border: 1px solid var(--border); border-radius: 25px; padding: 20px; margin: 15px 0; border-left: 5px solid var(--gold); }
-        .bal-val { font-family: 'Orbitron'; font-size: 38px; font-weight: 900; color: #fff; margin: 5px 0; }
+        /* පින්තූරෙ තිබ්බ වගේ Premium Vault Card එක */
+        .vault-card { 
+            width: 100%; 
+            background: linear-gradient(145deg, #0f0f0f, #050505); 
+            border: 1px solid #222; 
+            border-radius: 20px; 
+            padding: 25px; 
+            margin: 15px 0; 
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .vault-card::before { content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 40%; background: var(--gold); border-radius: 0 0 5px 0; }
 
-        /* Level Bar */
-        .level-container { width: 100%; background: #111; height: 8px; border-radius: 10px; margin-top: 10px; overflow: hidden; border: 1px solid #222; }
-        .level-bar { height: 100%; background: var(--gold); width: 0%; transition: width 0.5s; shadow: 0 0 10px var(--gold); }
+        .bal-val { font-family: 'Orbitron'; font-size: 40px; font-weight: 900; color: #fff; margin: 5px 0; letter-spacing: -1px; }
 
-        /* Mining Core Logo */
-        .core-btn { width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(circle, #1a1a1a, #000); border: 5px solid var(--border); margin: 20px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: transform 0.1s; box-shadow: 0 0 40px rgba(241, 196, 15, 0.1); }
-        .core-btn:active { transform: scale(0.92); border-color: var(--gold); }
-        .core-btn img { width: 80%; height: 80%; border-radius: 50%; object-fit: cover; pointer-events: none; }
+        /* Level Bar - පින්තූරෙ වගේ ලස්සනට */
+        .level-container { width: 100%; background: #111; height: 6px; border-radius: 10px; margin-top: 15px; overflow: hidden; border: 1px solid #1a1a1a; }
+        .level-bar { height: 100%; background: linear-gradient(90deg, #b8860b, var(--gold)); width: 0%; transition: width 0.5s; box-shadow: 0 0 15px var(--gold-glow); }
 
-        .card { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 15px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; text-align: left; }
-        .btn-action { background: var(--gold); color: #000; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 800; font-size: 10px; cursor: pointer; text-transform: uppercase; }
-        .btn-action:disabled { background: #333; color: #666; cursor: not-allowed; }
+        /* මචං මේක තමයි අර පින්තූරෙ වගේ කැරකෙන කොයින් එක */
+        .core-btn-wrap {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            margin: 30px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-        .nav { position: fixed; bottom: 0; width: 100%; max-width: 500px; left: 50%; transform: translateX(-50%); display: flex; background: #000; border-top: 1px solid var(--border); padding: 15px 0; z-index: 1000; }
-        .nav-item { flex: 1; font-size: 9px; color: #444; text-align: center; cursor: pointer; font-weight: 900; letter-spacing: 1px; }
-        .nav-item.active { color: var(--gold); }
+        /* කොයින් එක වටේ කැරකෙන Border එක */
+        .core-btn-wrap::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px dashed var(--gold);
+            opacity: 0.3;
+            animation: rotate 10s linear infinite;
+        }
 
-        .float-text { position: absolute; color: var(--gold); font-weight: 900; font-size: 26px; animation: floatUp 0.6s forwards; pointer-events: none; z-index: 100; }
-        @keyframes floatUp { to { opacity: 0; transform: translateY(-120px); } }
-        
-        .policy-link { font-size: 10px; color: #444; margin-top: 20px; text-decoration: none; display: block; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .core-btn { 
+            width: 220px; 
+            height: 220px; 
+            border-radius: 50%; 
+            background: radial-gradient(circle, #1a1a1a 0%, #000 100%); 
+            border: 4px solid #1a1a1a; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            position: relative; 
+            transition: transform 0.1s; 
+            box-shadow: 0 0 60px rgba(0,0,0,1), inset 0 0 30px rgba(241, 196, 15, 0.05); 
+            z-index: 2;
+        }
+
+        .core-btn:active { transform: scale(0.92); }
+        .core-btn img { width: 75%; height: 75%; object-fit: contain; pointer-events: none; filter: drop-shadow(0 0 15px rgba(0,0,0,0.5)); }
+
+        /* පින්තූරෙ වගේ Energy Display */
+        .energy-info { font-size: 16px; font-weight: 800; font-family: 'Orbitron'; margin-top: 10px; color: #fff; display: flex; align-items: center; gap: 8px; }
+        .energy-info span { color: var(--gold); }
+
+        /* UI Cards - පින්තූරෙ වගේ Glass effect */
+        .card { width: 100%; background: var(--card); border: 1px solid #1a1a1a; border-radius: 18px; padding: 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; backdrop-filter: blur(10px); }
+        .btn-action { background: var(--gold); color: #000; border: none; padding: 12px 22px; border-radius: 12px; font-weight: 900; font-size: 11px; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 15px var(--gold-glow); }
+
+        /* Navigation - පින්තූරෙ වගේ Bottom Nav */
+        .nav { position: fixed; bottom: 0; width: 100%; max-width: 500px; left: 50%; transform: translateX(-50%); display: flex; background: rgba(0,0,0,0.95); border-top: 1px solid #1a1a1a; padding: 20px 0; z-index: 1000; backdrop-filter: blur(10px); }
+        .nav-item { flex: 1; font-size: 10px; color: #555; text-align: center; cursor: pointer; font-weight: 800; letter-spacing: 1.5px; transition: 0.3s; }
+        .nav-item.active { color: var(--gold); text-shadow: 0 0 10px var(--gold-glow); }
+
+        .float-text { position: absolute; color: #fff; font-weight: 900; font-size: 32px; animation: floatUp 0.7s ease-out forwards; pointer-events: none; z-index: 100; text-shadow: 0 0 10px var(--gold); }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-150px) scale(1.5); } }
     </style>
 </head>
 <body>
@@ -50,76 +108,43 @@
     <div class="content">
         <div id="mine" class="page active">
             <div class="vault-card">
-                <p style="color:#666; font-size:10px; letter-spacing:2px;">SECURE ASSETS</p>
+                <p style="color:#666; font-size:10px; letter-spacing:2px; font-weight:800;">VAULT ASSETS</p>
                 <div class="bal-val" id="balance">0.00</div>
-                <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--gold);">
+                <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--gold); font-family:'Orbitron'; margin-top:10px;">
                     <span id="level-name">LEVEL 1</span>
                     <span id="progress-percent">0%</span>
                 </div>
                 <div class="level-container"><div class="level-bar" id="level-bar"></div></div>
             </div>
             
-            <div class="core-btn" id="tap-btn">
-                <img src="https://www.svgrepo.com/show/433360/coin-gold.svg" alt="COCO LOGO">
+            <div class="core-btn-wrap">
+                <div class="core-btn" id="tap-btn">
+                    <img src="https://cdni.iconscout.com/illustration/premium/thumb/coconut-illustration-download-in-svg-png-gif-file-formats--fruit-tropical-food-halved-pack-drink-illustrations-4847321.png" alt="COCONUT">
+                </div>
             </div>
             
-            <div style="font-size:14px; font-weight:800;">⚡ <span id="energy">1000</span> / <span id="max-energy">1000</span></div>
-            <a href="#" class="policy-link" onclick="showPage('policy', this)">Privacy Policy & Terms</a>
+            <div class="energy-info">⚡ <span id="energy">1000</span> / <span id="max-energy">1000</span></div>
+            <p style="font-size:9px; color:#444; margin-top:20px; letter-spacing:1px;">SECURE MINING NODE ACTIVE</p>
         </div>
 
         <div id="tasks" class="page">
-            <h3 style="margin-bottom:20px; font-family:'Orbitron'; color:var(--gold);">MISSIONS</h3>
-            <div class="card"><div><b>YouTube Mission</b><br><small>Subscribe & Watch</small></div><button class="btn-action" onclick="doTask('yt','https://youtube.com/@cococoin-i9m?si=LQ-WTjpo1SCsgpQn',10000)">+10k</button></div>
-            <div class="card"><div><b>TikTok Mission</b><br><small>Follow & Like</small></div><button class="btn-action" onclick="doTask('tk','https://www.tiktok.com/@coco.coin0?_r=1&_t=ZS-93N9riatjyD',10000)">+10k</button></div>
-            <div class="card"><div><b>Facebook Mission</b><br><small>Like & Share</small></div><button class="btn-action" onclick="doTask('fb','https://www.facebook.com/share/1D3h6b2HQU/',10000)">+10k</button></div>
-            <div class="card"><div><b>Telegram News</b><br><small>Join Channel</small></div><button class="btn-action" onclick="doTask('tgn','https://t.me/+5yPR6-ct7VYyMGVl',15000)">+15k</button></div>
-            <div class="card"><div><b>Register Wallet</b><br><small>Register & Verify</small></div><button class="btn-action" onclick="doTask('wal','https://t.me',25000)">+25k</button></div>
-            <div class="card"><div><b>Download App</b><br><small>Install App</small></div><button class="btn-action" onclick="doTask('app','https://t.me',30000)">+30k</button></div>
-        </div>
-
-        <div id="friends" class="page">
-            <h3 style="margin-bottom:20px; font-family:'Orbitron';">NETWORK</h3>
-            <div class="card" style="display:block; text-align:center;">
-                <p style="font-size:10px; margin-bottom:10px;">INVITE LINK</p>
-                <div id="https://t.me/Cococoin_mining_bot" style="background:#000; padding:15px; border:1px dashed #333; font-size:10px; color:var(--gold); margin-bottom:10px; word-break:break-all;"></div>
-                <button class="btn-action" style="width:100%" onclick="copyRef()">COPY LINK</button>
-            </div>
-            <div class="card"><div><b>Total Referrals</b></div><b id="ref-count" style="color:var(--gold); font-size:20px;">0</b></div>
+            <h3 style="margin-bottom:25px; font-family:'Orbitron'; color:var(--gold); letter-spacing:2px;">MISSIONS</h3>
+            <div class="card"><div><b>YouTube Mission</b><br><small style="color:#666">+10,000 COCO</small></div><button class="btn-action" onclick="doTask('yt','https://youtube.com/@cococoin-i9m?si=LQ-WTjpo1SCsgpQn',10000)">GO</button></div>
+            <div class="card"><div><b>TikTok Mission</b><br><small style="color:#666">+10,000 COCO</small></div><button class="btn-action" onclick="doTask('tk','https://www.tiktok.com/@coco.coin0?_r=1&_t=ZS-93N9riatjyD',10000)">GO</button></div>
+            <div class="card"><div><b>Telegram News</b><br><small style="color:#666">+15,000 COCO</small></div><button class="btn-action" onclick="doTask('tgn','https://t.me/+5yPR6-ct7VYyMGVl',15000)">GO</button></div>
+            <div class="card"><div><b>Facebook Page</b><br><small style="color:#666">+10,000 COCO</small></div><button class="btn-action" onclick="doTask('fb','https://www.facebook.com/share/1D3h6b2HQU/',10000)">GO</button></div>
         </div>
 
         <div id="vault" class="page">
-            <h3 style="margin-bottom:20px; font-family:'Orbitron'; color:var(--gold);">UPGRADES</h3>
-            <div class="card">
-                <div><b>Multitap</b><br><small id="multi-cost">Cost: 2,000</small></div>
-                <button class="btn-action" onclick="buyBoost('multi')">UPGRADE</button>
-            </div>
-            <div class="card">
-                <div><b>Energy Upgrade</b><br><small id="energy-cost">Cost: 2,000</small></div>
-                <button class="btn-action" onclick="buyBoost('energy')">BOOST</button>
-            </div>
-            <div class="card" style="display:block; margin-top:20px;">
-                <p style="font-size:10px; color:#888; margin-bottom:10px;">WITHDRAW ASSETS</p>
-                <input type="text" id="wallet-addr" placeholder="ENTER COCO ADDRESS" style="width:100%; background:#000; border:1px solid #222; padding:15px; color:white; border-radius:10px; margin-bottom:15px;">
-                <button class="btn-action" style="width:100%" onclick="alert('Audit in Progress.')">INITIATE WITHDRAWAL</button>
-            </div>
-        </div>
-
-        <div id="policy" class="page">
-            <h3 style="margin-bottom:20px; font-family:'Orbitron';">PRIVACY POLICY</h3>
-            <div style="text-align:left; font-size:11px; color:#888; line-height:1.6;">
-                <p>1. Data Security: All mining data is encrypted via Firebase Secure Core.</p><br>
-                <p>2. Assets: COCO coins are virtual assets until the official Phase 2 listing.</p><br>
-                <p>3. Fair Play: Any use of automation or bots will lead to a permanent ban.</p><br>
-                <p>4. Updates: The COCO team reserves the right to adjust reward rates.</p>
-            </div>
-            <button class="btn-action" style="margin-top:20px;" onclick="showPage('mine', null)">BACK TO CORE</button>
+            <h3 style="margin-bottom:25px; font-family:'Orbitron'; color:var(--gold); letter-spacing:2px;">UPGRADES</h3>
+            <div class="card"><div><b>Multitap</b><br><small id="multi-cost" style="color:#666">Cost: 2,000</small></div><button class="btn-action" onclick="buyBoost('multi')">UPGRADE</button></div>
+            <div class="card"><div><b>Energy Boost</b><br><small id="energy-cost" style="color:#666">Cost: 2,000</small></div><button class="btn-action" onclick="buyBoost('energy')">BOOST</button></div>
         </div>
     </div>
 
     <nav class="nav">
         <div class="nav-item active" onclick="showPage('mine', this)">CORE</div>
         <div class="nav-item" onclick="showPage('tasks', this)">TASKS</div>
-        <div class="nav-item" onclick="showPage('friends', this)">FRIENDS</div>
         <div class="nav-item" onclick="showPage('vault', this)">VAULT</div>
     </nav>
 
@@ -138,7 +163,7 @@
         tg.expand();
 
         let userId = tg.initDataUnsafe?.user?.id || "GUEST_" + Math.floor(Math.random()*9999);
-        let balance = 0, energy = 1000, maxEnergy = 1000, multi = 1, refCount = 0;
+        let balance = 0, energy = 1000, maxEnergy = 1000, multi = 1;
 
         function loadData() {
             db.ref('users/' + userId).on('value', (snap) => {
@@ -147,10 +172,9 @@
                     balance = data.balance || 0;
                     maxEnergy = data.maxEnergy || 1000;
                     multi = data.multi || 1;
-                    refCount = data.refCount || 0;
                     updateUI();
                 } else {
-                    db.ref('users/' + userId).set({ balance: 0, maxEnergy: 1000, multi: 1, refCount: 0 });
+                    db.ref('users/' + userId).set({ balance: 0, maxEnergy: 1000, multi: 1 });
                 }
             });
         }
@@ -159,21 +183,15 @@
             document.getElementById('balance').innerText = balance.toLocaleString(undefined, {minimumFractionDigits: 2});
             document.getElementById('energy').innerText = Math.floor(energy);
             document.getElementById('max-energy').innerText = maxEnergy;
-            document.getElementById('ref-count').innerText = refCount;
-            document.getElementById('user-id').innerText = "SECURE ID: " + userId;
-            document.getElementById('ref-link').innerText = "https://t.me/COCO_COIN_BOT?start=" + userId;
             
-            // Level Logic
             let lvl = Math.floor(balance / 50000) + 1;
             let prog = ((balance % 50000) / 50000) * 100;
             document.getElementById('level-name').innerText = "LEVEL " + lvl;
             document.getElementById('progress-percent').innerText = Math.floor(prog) + "%";
             document.getElementById('level-bar').style.width = prog + "%";
 
-            // Upgrade Costs
             document.getElementById('multi-cost').innerText = "Cost: " + (multi * 2000).toLocaleString();
-            let energyLvl = (maxEnergy - 1000) / 500;
-            let eCost = Math.pow(2, energyLvl) * 2000;
+            let eCost = Math.pow(2, (maxEnergy - 1000) / 500) * 2000;
             document.getElementById('energy-cost').innerText = "Cost: " + eCost.toLocaleString();
         }
 
@@ -188,10 +206,10 @@
             f.className = 'float-text'; f.innerText = '+' + multi;
             f.style.left = t.clientX + 'px'; f.style.top = t.clientY + 'px';
             document.body.appendChild(f);
-            setTimeout(() => f.remove(), 600);
+            setTimeout(() => f.remove(), 700);
 
             db.ref('users/' + userId).update({ balance });
-            if(navigator.vibrate) navigator.vibrate(25);
+            if(navigator.vibrate) navigator.vibrate(30);
         });
 
         function doTask(id, url, amt) {
@@ -199,24 +217,17 @@
             setTimeout(() => {
                 balance += amt;
                 db.ref('users/' + userId).update({ balance });
-                alert("Task Verified! +" + amt);
+                alert("MISSION SUCCESS: +" + amt + " COCO");
             }, 5000);
         }
 
         function buyBoost(type) {
             if(type === 'multi') {
                 let cost = multi * 2000;
-                if(balance >= cost) {
-                    balance -= cost; multi++;
-                    db.ref('users/' + userId).update({ balance, multi });
-                } else { alert("Insufficient COCO!"); }
+                if(balance >= cost) { balance -= cost; multi++; db.ref('users/' + userId).update({ balance, multi }); }
             } else {
-                let energyLvl = (maxEnergy - 1000) / 500;
-                let cost = Math.pow(2, energyLvl) * 2000;
-                if(balance >= cost && energyLvl < 10) {
-                    balance -= cost; maxEnergy += 500;
-                    db.ref('users/' + userId).update({ balance, maxEnergy });
-                } else { alert("Insufficient COCO or Max Level reached!"); }
+                let cost = Math.pow(2, (maxEnergy - 1000) / 500) * 2000;
+                if(balance >= cost) { balance -= cost; maxEnergy += 500; db.ref('users/' + userId).update({ balance, maxEnergy }); }
             }
         }
 
@@ -227,12 +238,7 @@
             if(el) el.classList.add('active');
         }
 
-        function copyRef() {
-            navigator.clipboard.writeText(document.getElementById('ref-link').innerText);
-            alert("Invite Link Copied!");
-        }
-
-        setInterval(() => { if(energy < maxEnergy) { energy += 2; updateUI(); } }, 1000);
+        setInterval(() => { if(energy < maxEnergy) { energy += 2.5; updateUI(); } }, 1000);
         loadData();
     </script>
 </body>
